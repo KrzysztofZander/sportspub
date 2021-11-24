@@ -9,6 +9,7 @@
 
   <!-- mock -->
   <div class="wrapper">
+    <!-- HEAD -->
     <div class="header">
       <div class="h1 h-menu">
         <div  class="menu-items" >
@@ -30,59 +31,155 @@
         </div>
       </div>
     </div>
-    <div class="main">
-      <div class="main-foto img-full-container" >
-          <img class="img-full in-border" alt="" v-bind:src="require('./assets/images/logos/' + events[selectedEnevetId-1].img)"  >
-      </div>
-      <div class="main-text main-title">
-        {{ events[selectedEnevetId-1].title }}
-      </div>
-      <div class="main-text main-text-text">
-        <span >
-          {{ events[selectedEnevetId-1].text }}
-        </span>
-      </div>
-      <div class="main-res" > 
-        <Button label="REZERWACJA" />
+
+    <!-- MAIN -->
+    <div  class="main">
+      <div v-if="selectedNavItemId == 1" class="main-home" >
+        <div class="main-foto img-full-container" >
+            <img class="img-full in-border" alt="" v-bind:src="require('./assets/images/logos/' + events[selectedEnevetId-1].img)"  >
+        </div>
+        <div class="main-text main-title">
+          {{ events[selectedEnevetId-1].title }}
+        </div>
+        <div class="main-text main-text-text">
+          <span >
+            {{ events[selectedEnevetId-1].text }}
+          </span>
+        </div>
+        <div class="main-res" > 
+          <Button label="REZERWACJA" />
+        </div>
+        <div class="main-ind">
+            <div v-for="event in events" v-bind:key="event.id" >
+              <Button @click="changeEvent(event.id)" v-if="event.id == selectedEnevetId"  class="p-button ind-btn" />
+              <Button @click="changeEvent(event.id)" v-else  class="p-button-secondary ind-btn" />
+            </div>
+        </div>
       </div>
 
-      <div class="main-ind">
-          <div v-for="event in events" v-bind:key="event.id" >
-            <Button @click="changeEvent(event.id)" v-if="event.id == selectedEnevetId"  class="p-button ind-btn" />
-            <Button @click="changeEvent(event.id)" v-else  class="p-button-secondary ind-btn" />
+      <div v-if="selectedNavItemId == 4" class="main-contact" >
+        
+        <div class="main-content" >
+          <div class="map">
+            <GoogleMap
+              :api-key="googleApiKey"
+              style="width:100%; height:100%"
+              :center="center"
+              :zoom="15"
+              >
+                <Marker :options="{ position: center }" />
+            </GoogleMap>
           </div>
+          <div class="contact-form" >
+            <div class="contact-title">
+              Skontaktuj się z nami
+            </div>
+            <div class="contact-address contact-prop">
+              Księdza Leona Miszewskiego 12/13
+              <br> 80-239 Gdańsk
+
+            </div>
+            <div class="contact-n-week contact-prop">
+              Pon. - Czw. 16:00 – 00:00
+            </div>
+            <div class="contact-week contact-prop">
+              Pt. - Sob. 16:00 – 02:00
+            </div>
+            <div class="contact-phone contact-prop">
+              <i class="pi pi-phone" style="font-size: 1.2vw; margin-right:5%;"/>609 260 113
+            </div>
+            <div class="contact-email contact-prop">
+              sportspub@pub.com
+            </div>
+            <div class="contact-facebook contact-prop">
+              <div>
+                <i class="pi pi-facebook" style="font-size: 2vw; width:30%;float:left;color:#4267B2"/>
+                <i class="pi pi-instagram" id="insta" style="font-size: 2vw; width:30%;float:left"/>
+                <i class="pi pi-twitter" style="font-size: 2vw; width:30%;float:left;color:#1DA1F2"/>
+                
+              </div>
+            </div>
+
+          </div>
+
+        </div>
       </div>
+
+      <div v-if="selectedNavItemId == 2" class="main-calendar" >
+        <div class="main-content"> 
+          <div class="calendar-calendar" >
+            <Calendar style="width:100%;height:100%; background:unset" v-model="value" dateFormat="dd.mm.yy" :inline="true" />
+          </div>
+          <div class="calendar-events" >
+            <Carousel :value="cars">
+              <template #item="slotProps">
+                {{ slotProps.data }}
+              </template>
+            </Carousel>
+          </div>
+        </div>
+      </div>
+
+
     </div>
+
+    <!-- FOOT -->
     <div class="footer">
-      <div class="sports sports-background-img">
+      <div v-if="selectedNavItemId == 1" class="fotter-home" >
+        <div class="sports">
+          <div class="img-full-container in-footer">
+            <img class="img-full" src="./assets/images/backgrounds/colors.png" alt="">
+          </div>
+        </div>
+        <div class="musics">
+          <div class="img-full-container in-footer">
+            <img class="img-full" src="./assets/images/backgrounds/musics2.png" alt="">
+          </div>
+        </div>
+        <div class="footer-btn-sports" >
+            <Button label="WYDARZENIA SPORTOWE"/>
+        </div>
+        <div class="footer-btn-musics" >
+            <Button label="WYDARZENIA MUZYCZNE"/>
+        </div>
       </div>
-      <div class="musics">
-        <!-- <img class="" alt="" src="./assets/images/backgrounds/colors.jpg"> -->
-      </div>
+      
     </div>
+
   </div>
 
   <div style="display:none" >
     <Button/>
+    <Calendar v-model="value" dateFormat="dd.mm.yy" />
   </div>
+
+
 
 
 </template>
 
 <script>
-import DashBoard from './components/DashBoard.vue'
+import DashBoard from './components/DashBoard.vue';
 import Button from 'primevue/button';
+import { GoogleMap, Marker } from 'vue3-google-map';
+import Calendar from 'primevue/calendar';
+
 
 export default {
   name: 'App',
   components: {
     DashBoard,
-    Button
+    Button,
+    GoogleMap,
+    Marker,
+    Calendar
   },
   data () {
     return {
       selectedEnevetId:1,
       selectedNavItemId:1,
+      center:{ lat: 54.3770562, lng: 18.6147892 },
+      googleApiKey:null,
       menus:[
       {
         id:1,
@@ -97,7 +194,7 @@ export default {
         name:"Galeria"
       },
       {
-        id:5,
+        id:4,
         name:"Kontakt"
       }
 
@@ -144,11 +241,40 @@ export default {
 
           title:"WYDARZENIE TEMATYCZNE"
         }
+      ],
+      responsiveOptions: [
+        {
+          breakpoint: '1024px',
+          numVisible: 3,
+          numScroll: 3
+        },
+        {
+          breakpoint: '600px',
+          numVisible: 2,
+          numScroll: 2
+        },
+        {
+          breakpoint: '480px',
+          numVisible: 1,
+          numScroll: 1
+        }
+      ],
+      cars:[
+        {
+          data:'1'
+        },
+        {
+          data:'2'
+        }
       ]
     }
   },
   mounted () {
     this.startEventInteraval()
+    
+  },
+  created () {
+    this.googleApiKey = process.env.VUE_APP_GOOGLE_MAP_API_KEY
   },
   methods: {
     startEventInteraval(){
@@ -174,6 +300,134 @@ p{
 body{
     background: black;
 }
+.map{
+    width: 64%;
+    height: 79%;
+    float: left;
+}
+#insta {
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  -webkit-background-clip: text;
+          /* Also define standard property for compatibility */
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  font-size: 200px; /* change this to change the size*/
+  
+}
+.fotter-home{
+  display: grid;
+  grid-row:1/5;
+  grid-column:1/6;
+}
+.main-home{
+  grid-column: 1/11;
+  grid-row: 1/11;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+}
+.main-contact{
+  margin-top: 2%;
+  grid-column: 1/11;
+  grid-row: 1/11;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+}
+
+.contact-form{
+  float: right;
+  width: 35%;
+  height: 90%;
+  display: grid;
+  grid-template-rows: repeat(22, 1fr);
+}
+.contact-prop{
+  font-weight: 600;
+  font-size: 1VW;
+  color:white;
+
+}
+.contact-title{
+  grid-row: 3;
+  color:#2196f3 ;
+  font-weight: 600;
+  font-size: 1.6VW;
+}
+.contact-address{
+  grid-row: 5;
+}
+.contact-n-week{
+  grid-row: 6;
+}
+.contact-week{
+  grid-row: 7;
+}
+.contact-phone{
+    grid-row: 9;
+}
+.contact-email{
+    grid-row: 10;
+    color:#2196f3 ;
+}
+.contact-facebook{
+    grid-row: 19;
+    margin-right:35%;
+    margin-left:2%;
+    color:#2196f3 ;
+    cursor: pointer;
+}
+.main-content{
+    /* border: solid white; */
+    width: 67vw;
+    height: 67vh;
+}
+.calendar-calendar{
+  /* border: solid red; */
+  width:50%;
+  height:100%;
+  float:left;
+}
+.calendar-calendar div{
+  background: #00000096;
+  color: white;
+  border: unset;
+
+}
+.calendar-calendar span:hover{
+  color: black;
+}
+.p-datepicker-header{
+  background: #00000096 !important;
+}
+.p-link{
+  color: white !important
+}
+.calendar-events{
+  background: #00000096;
+  color: white;
+  float: right;
+  border: solid red;
+  width:50%;
+  height:100%;
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  grid-template-rows: repeat(5,1fr);
+
+}
+.in-footer{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.in-footer img{
+  width:100%;
+  height:100%
+}
+
 .events{
     width: 50%;
     margin: unset;
@@ -194,7 +448,7 @@ body{
   bottom: 0;
   display: grid;
   border-style: solid;
-  border-color: red;
+  /* border-color: red; */
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: repeat(8, 1fr);
   grid-gap: 10px;
@@ -305,25 +559,18 @@ body{
 
 }
 .footer {
-  grid-column: 2/6;
-  grid-row: 6/9;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+    grid-column: 2/6;
+    grid-row: 6/9;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
 
 }
-.footer img{
-    position: absolute;
-    width: 100%;
-    height: -webkit-fill-available;
-    border: blue solid;
-    max-width: max-content;
-    right: 0;
-}
 .sports{
-  border: white solid;
-  grid-column: 1/3;
-  position: relative;
-  margin: 0 12%;
+    grid-column: 1/3;
+    grid-row: 1/4;
+    position: relative;
+    margin: 0 12%;
 }
 .sports-foto{
     position: absolute;
@@ -331,8 +578,22 @@ body{
     top: 0
 
 }
+.footer-btn-sports{
+    grid-column: 1/3;
+    grid-row: 4/5;
+    margin: 0 12%;
+}
+.footer-btn-musics{
+    grid-column: 3/5;
+    grid-row: 4/5;
+}
+.footer button{
+    width: 100%;
+    margin-top: 2%;    
+}
 .musics{
-  border: white solid;
+  /* border: white solid; */
+  grid-row: 1/4;
   grid-column: 3/5;
   position: relative;
   margin: 0% -2%;
@@ -353,6 +614,7 @@ body{
     margin-left: auto;
     margin-right: auto;
     max-width: -webkit-fill-available;
+    border-radius: 5%
 }
 .img-full{
     transition: all .5s;
